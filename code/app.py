@@ -7,7 +7,7 @@ api = Api(app)
 
 jobs = []
 
-#Job
+
 class Job(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument('company', 
@@ -18,7 +18,6 @@ class Job(Resource):
     parser.add_argument('salary')
     parser.add_argument('status')
 
-    #Add job (Post)
     def post(self, title):
 
         if next(filter(lambda x: x['title'] == title, jobs), None) is not None:
@@ -35,18 +34,26 @@ class Job(Resource):
 
         return job, 201
 
-#Get job (Get)
     def get(self, title):
         job  = next(filter(lambda x: x['title'] == title, jobs), None) # Returns a filter object, returns None if can;t find object
         return {'job': job}, 200 if job else 404
 
+    def put(self, title):
 
+        data = Job.parser.parse_args()
 
-    #    return None
-
-#Edit job (Put)
-    #def put():
-     #   return None
+        job = next(filter(lambda x: x['title'] == title, jobs), None)
+        if job is None:
+            job = {
+                'title': title, 
+                'company': data['company'], 
+                'salary': data['salary'], 
+                'status': data['status']
+                }
+            jobs.append(job)
+        else:
+            job.update(data)
+        return job
 
 #Remove job (Delete)
     #def delete():
