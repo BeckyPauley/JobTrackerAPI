@@ -55,9 +55,10 @@ class Job(Resource):
             job.update(data)
         return job
 
-#Remove job (Delete)
-    #def delete():
-     #   return None
+    def delete(self, title):
+        global jobs
+        jobs = list(filter(lambda x: x['title'] != title, jobs))
+        return {'message': 'Item deleted'}
 
 #JobsList
 #class job_list(Resource)
