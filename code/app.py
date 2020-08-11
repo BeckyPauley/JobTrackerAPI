@@ -7,7 +7,6 @@ api = Api(app)
 
 jobs = []
 
-
 class Job(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument('company', 
@@ -60,11 +59,13 @@ class Job(Resource):
         jobs = list(filter(lambda x: x['title'] != title, jobs))
         return {'message': 'Item deleted'}
 
-#JobsList
-#class job_list(Resource)
-#Get jobs (Get)
 
-#Endpoints
+class JobsList(Resource):
+
+    def get(self):
+        return {"jobs": jobs}
+
 api.add_resource(Job, '/job/<string:title>')
+api.add_resource(JobsList, '/jobs')
 
 app.run(port=5000, debug=True)
