@@ -37,7 +37,7 @@ class Job(Resource):
 
 #Get job (Get)
     def get(self, title):
-        title  = next(filter(lambda x: x['title'] == title, jobs), None) # Returns a filter object, returns None if can;t find object
+        job  = next(filter(lambda x: x['title'] == title, jobs), None) # Returns a filter object, returns None if can;t find object
         return {'job': job}, 200 if job else 404
 
 
