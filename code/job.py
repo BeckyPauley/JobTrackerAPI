@@ -1,6 +1,6 @@
 from flask_restful import Resource, reqparse
 
-jobs = []
+jobs = {}
 
 class Job(Resource):
     parser = reqparse.RequestParser()
@@ -15,55 +15,39 @@ class Job(Resource):
 
     def post(self, title):
 
-        if self.check_for_job(title) is not None:
-            return{'message': "A job with name '{}' already exists".format(title)}, 400
+        if jobs.get(title):
+           return{'message': f"A job with name '{title}' already exists"}, 400
 
         data = Job.parser.parse_args()
 
-        job = {
-            'title': title, 
-            'company': data['company'],
-            'salary': data['salary'],
-            'status': data['status']
+        jobs.update(
+            {title : {
+                'company': data['company'],
+                'salary': data['salary'],
+                'status': data['status']
+                }
             }
-        jobs.append(job)
-
-        return job, 201
-
-    def check_for_job(self, title):
-        for job in jobs:
-            if job['title'] == title:
-                return job
-        return None
+        )
+        return jobs[title], 201
 
     def get(self, title):
-        job = self.check_for_job(title)
-        if job:
-            return {'job': job}, 200
+        if jobs.get(title):
+            return jobs[title], 200
         else:
-            return{"message": "Job does not exist"}, 404
+            return{"message": f"A job with neme {title} does not exist"}, 404
 
     def put(self, title):
 
         data = Job.parser.parse_args()
 
-        job = self.check_for_job(title)
-        if job is None:
-            job = {
-                'title': title,
-                'company': data['company'],
-                'salary': data['salary'],
-                'status': data['status']
-                }
-            jobs.append(job), 201
+        if jobs.get(title):
+            jobs[title].update(data), 200
+            return jobs[title]
         else:
-            job.update(data), 200
-        return job
+            return self.post(title)
 
     def delete(self, title):
-        if self.check_for_job(title) is None:
-            return{'message': "A job with name '{}' does not exist".format(title)}, 400
-        global jobs
-        jobs = list([job for job in jobs if job['title'] != title])
-        return {'message': 'Item deleted'}, 200
-
+        if jobs.get(title) == None:
+            return {'message': f"A job with name '{title}' does not exist"}, 400
+        jobs.pop(title)
+        return {'message' : f"{title} deleted"}, 200
